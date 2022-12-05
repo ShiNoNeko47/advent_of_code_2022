@@ -32,7 +32,6 @@ fn main() {
         // println!("{crates:?}");
         let length = crates[instruction[1]-1].len();
         let mut stack: Vec<char> = crates[instruction[1]-1].drain((length-instruction[0])..).collect();
-        stack.reverse();
         crates[instruction[2]-1].append(&mut stack);
         for i in &crates {
             println!("{i:?}");
