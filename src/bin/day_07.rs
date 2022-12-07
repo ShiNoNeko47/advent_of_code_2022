@@ -13,16 +13,18 @@ impl PartialEq for Directory {
 fn main() {
     let input: Vec<&str> = include_str!("./day_07.input").trim().split("\n").collect();
 
-    let mut result: u32 = 0;
+    let mut result: u32 = 45717263;
 
     let mut dir_chain: Vec<Directory> = vec![];
+
+    let space_needed: u32 = 30000000 - (70000000 - 45717263);
     
     for i in input {
 
         if i == "$ cd .." {
             let size: u32 = dir_chain.pop().unwrap().size;
-            if size <= 100000 {
-                result += size;
+            if size >= space_needed && size < result {
+                result = size;
             }
         }
         else if i.starts_with("$ cd") {
