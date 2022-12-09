@@ -1,3 +1,5 @@
+use std::io::stdin;
+
 #[derive(Debug, Clone, Copy)]
 struct Position {
     x: isize,
@@ -27,49 +29,60 @@ fn main() {
 
     let input: Vec<char> = input.into_iter().flat_map(|x| x).collect();
 
-    let mut head: Position = Position { x: 0, y: 0 };
-    let mut tail: Position = Position { x: 0, y: 0 };
+    let mut rope: Vec<Position> = vec![Position { x: 0, y: 0 }; 10];
 
     let mut visited: Vec<Position> = vec![Position { x: 0, y: 0 }];
 
     for direction in input {
         match direction {
             'U' => {
-                head.y += 1;
-                if head.y == tail.y+2 {
-                    tail.y += 1;
-                    tail.x = head.x;
-                }
+                rope[0].y += 1;
             },
             'D' => {
-                head.y -= 1;
-                if head.y == tail.y-2 {
-                    tail.y -= 1;
-                    tail.x = head.x;
-                }
+                rope[0].y -= 1;
             },
             'L' => {
-                head.x -= 1;
-                if head.x == tail.x-2 {
-                    tail.x -= 1;
-                    tail.y = head.y;
-                }
+                rope[0].x -= 1;
             },
             'R' => {
-                head.x += 1;
-                if head.x == tail.x+2 {
-                    tail.x += 1;
-                    tail.y = head.y;
-                }
+                rope[0].x += 1;
             },
             _ => panic!("invalid direction")
         }
-        if !visited.contains(&tail) {
-            visited.push(tail.clone());
+        for i in 1..10 {
+            if rope[i-1].y > rope[i].y && rope[i-1].x > rope[i].x && (rope[i-1].x > rope[i].x+1 || rope[i-1].y > rope[i].y+1) {
+                rope[i].y += 1;
+                rope[i].x += 1;
+            }
+            else if rope[i-1].y < rope[i].y && rope[i-1].x > rope[i].x && (rope[i-1].x > rope[i].x+1 || rope[i-1].y < rope[i].y-1) {
+                rope[i].y -= 1;
+                rope[i].x += 1;
+            }
+            else if rope[i-1].y < rope[i].y && rope[i-1].x < rope[i].x && (rope[i-1].x < rope[i].x-1 || rope[i-1].y < rope[i].y-1) {
+                rope[i].y -= 1;
+                rope[i].x -= 1;
+            }
+            else if rope[i-1].y > rope[i].y && rope[i-1].x < rope[i].x && (rope[i-1].x < rope[i].x-1 || rope[i-1].y > rope[i].y+1) {
+                rope[i].y += 1;
+                rope[i].x -= 1;
+            }
+            else if rope[i-1].y > rope[i].y+1 {
+                rope[i].y += 1;
+            }
+            else if rope[i-1].y < rope[i].y-1 {
+                rope[i].y -= 1;
+            }
+            else if rope[i-1].x > rope[i].x+1 {
+                rope[i].x += 1;
+            }
+            else if rope[i-1].x < rope[i].x-1 {
+                rope[i].x -= 1;
+            }
+        }
+        if !visited.contains(&rope[9]) {
+            visited.push(rope[9].clone());
         }
     }
 
     println!("{}", visited.len());
-
-    // println!("{input:?}");
 }
