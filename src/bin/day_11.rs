@@ -1,10 +1,10 @@
 #[derive(Debug)]
 struct Monkey {
-    activity: u32,
-    items: Vec<u32>,
+    activity: u64,
+    items: Vec<u64>,
     operation: char,
-    operand: u32,
-    test: Vec<u32>
+    operand: u64,
+    test: Vec<u64>
 }
 
 impl PartialEq for Monkey {
@@ -29,7 +29,7 @@ impl Ord for Monkey {
 fn main() {
     let binding = include_str!("./day_11.input").replace(",", "").to_string();
     let mut operations: Vec<char> = vec![];
-    let input: Vec<Vec<Vec<u32>>> = binding.trim()
+    let input: Vec<Vec<Vec<u64>>> = binding.trim()
         .split("\n\n")
             .map(|x| x.split("\n")
                 .skip(1)
@@ -42,7 +42,7 @@ fn main() {
                             if ["+", "*"].contains(&s) {
                                 operations.push(s.chars().nth(0).unwrap());
                             }
-                            s.parse::<u32>().ok()})
+                            s.parse::<u64>().ok()})
                         .collect()
                     )
                  .collect())
@@ -50,6 +50,7 @@ fn main() {
      operations.reverse();
 
     let mut monkeys: Vec<Monkey> = vec![];
+    let mut tests: Vec<u64> = vec![];
 
     for monkey in input {
         monkeys.push(
@@ -66,16 +67,18 @@ fn main() {
                 test: monkey[2..=4].iter()
                     .map(|x| x[0])
                     .collect() }
-        )
+        );
+        tests.push(monkey[2][0]);
     }
 
-    for _ in 0..20 {
+    for _ in 0..10000 {
         println!("{monkeys:#?}");
         for monkey in 0..monkeys.len() {
             let items = monkeys[monkey].items.clone();
-            monkeys[monkey].activity += items.len() as u32;
+            monkeys[monkey].activity += items.len() as u64;
             for item in items {
-                let worry: u32 = match monkeys[monkey].operand {
+                let mut worry_new = 1;
+                let worry: u64 = match monkeys[monkey].operand {
                     0 => match monkeys[monkey].operation {
                         '+' => item + item,
                         '*' => item * item,
@@ -87,14 +90,18 @@ fn main() {
                         _ => 0
                     }
                 };
+
+                worry_new = worry % tests.iter().product::<u64>();
+
+                let worry = worry_new;
                 let test: usize;
-                if (worry / 3) % monkeys[monkey].test[0] == 0 {
+                if (worry) % monkeys[monkey].test[0] == 0 {
                     test = monkeys[monkey].test[1] as usize;
                 }
                 else {
                     test = monkeys[monkey].test[2] as usize;
                 }
-                monkeys[test].items.push(worry / 3);
+                monkeys[test].items.push(worry);
             }
             monkeys[monkey].items = vec![];
         }
